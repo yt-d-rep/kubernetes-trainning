@@ -1,0 +1,5 @@
+# credentials
+*.pem
+*.ppk
+credentials/
+id_rsa
