@@ -1,0 +1,13 @@
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: web-pvc
+  namespace: mattermost
+  annotations:
+    volume.beta.kubernetes.io/storage-class: gcp-storage
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 100Gi

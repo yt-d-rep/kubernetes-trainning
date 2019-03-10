@@ -1,0 +1,63 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: web
+  namespace: mattermost
+  labels:
+    app: web
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: web
+  template:
+    metadata:
+      labels:
+        app: web
+    spec:
+      # マウントディスクのパーミッション変更、外部ディスクマウント可とするため
+      # initContainers:
+      # - name: init-chown-web
+      #   image: busybox
+      #   imagePullPolicy: IfNotPresent
+      #   command: ["chown", "-R", "777:777", "/mattermost"]
+      #   volumeMounts:
+      #   - mountPath: /mattermost
+      #     name: web-pvc
+      # - name: init-chown-web-config
+      #   image: busybox
+      #   imagePullPolicy: IfNotPresent
+      #   command: ["chown", "-R", "777:777", "/mattermost"]
+      #   volumeMounts:
+      #   - mountPath: /mattermost
+      #     name: web-config-pvc
+      # コンテナ設定
+      containers:
+      - image: mattermost/mattermost-prod-app
+        name: web
+        env:
+        - name: DB_HOST
+          value: postgres.mattermost.svc.cluster.local
+        - name: MM_USERNAME
+          value: mattermost
+        - name: MM_PASSWORD
+          value: mattermost
+        - name: MM_DBNAME
+          value: mattermost
+        volumeMounts:
+        - name: web-pvc
+          mountPath: /mattermost/data
+        - name: web-pvc
+          mountPath: /mattermost/config
+        ports:
+        - containerPort: 8000
+      # マウントボリュームのuserグループ設定
+      securityContext:
+        fsGroup: 2000
+      volumes:
+      - name: web-pvc
+        persistentVolumeClaim:
+          claimName: web-pvc
+      - name: web-config-pvc
+        persistentVolumeClaim:
+          claimName: web-config-pvc

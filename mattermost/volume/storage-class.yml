@@ -1,0 +1,10 @@
+# Regional clusterの場合はparameterで replication-type: regional-pdを指定する
+kind: StorageClass
+apiVersion: storage.k8s.io/v1beta1
+metadata:
+  name: gcp-storage
+  namespace: mattermost
+provisioner: kubernetes.io/gce-pd
+parameters:
+  type: pd-standard
+reclaimPolicy: Delete
